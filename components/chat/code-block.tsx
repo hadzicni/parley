@@ -52,7 +52,7 @@ async function tokenize(code: string, lang: string) {
   if (!known) return null
   const { tokens } = await shiki.codeToTokens(code, {
     lang: lang as keyof typeof shiki.bundledLanguages,
-    themes: { light: "vitesse-light", dark: "vitesse-dark" },
+    themes: { light: "catppuccin-latte", dark: "poimandres" },
     defaultColor: false,
   })
   return tokens
@@ -99,9 +99,14 @@ export const CodeBlock = memo(function CodeBlock({
   const tail = usable ? code.slice(highlighted.code.length) : code
 
   return (
-    <div className="code-block group/code overflow-hidden rounded-xl border bg-card shadow-[0_1px_2px_rgb(0_0_0/0.03)]">
-      <div className="flex h-9 items-center justify-between border-b bg-muted/40 pr-1.5 pl-3.5">
-        <span className="font-mono text-[0.7rem] tracking-wide text-muted-foreground">
+    <div className="code-block group/code overflow-hidden rounded-2xl border bg-code shadow-[0_16px_40px_-24px_rgb(0_0_0/0.6)]">
+      <div className="flex h-9 items-center justify-between border-b bg-linear-to-r from-brand/10 via-transparent to-brand-2/10 pr-1.5 pl-3.5">
+        <span className="flex items-center gap-2 font-mono text-[0.7rem] tracking-wide text-muted-foreground">
+          <span className="flex gap-1">
+            <span className="size-2 rounded-full bg-brand-3/70" />
+            <span className="size-2 rounded-full bg-brand/70" />
+            <span className="size-2 rounded-full bg-brand-2/70" />
+          </span>
           {LANGUAGE_NAMES[language] ?? (language || "text")}
         </span>
         <CopyButton text={code} label="Copy code" size="icon-xs" />

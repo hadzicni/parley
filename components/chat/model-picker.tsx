@@ -86,7 +86,7 @@ export function ModelPicker() {
     >
       <PopoverTrigger
         className={cn(
-          "group/picker flex h-9 max-w-[min(22rem,60vw)] items-center gap-2 rounded-xl px-2.5 text-sm font-medium transition-colors outline-none hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:bg-accent"
+          "glass group/picker flex h-9 max-w-[min(22rem,60vw)] items-center gap-2 rounded-full border px-3.5 text-sm font-medium transition-[border-color,box-shadow] duration-300 outline-none hover:border-brand/40 hover:shadow-[0_0_24px_-8px_var(--brand)] focus-visible:ring-3 focus-visible:ring-ring/50 data-popup-open:border-brand/40 data-popup-open:shadow-[0_0_24px_-8px_var(--brand)]"
         )}
       >
         <span className="relative flex size-2 shrink-0">
@@ -94,9 +94,9 @@ export function ModelPicker() {
             className={cn(
               "absolute inset-0 rounded-full",
               offline
-                ? "bg-destructive"
+                ? "bg-destructive shadow-[0_0_8px_var(--destructive)]"
                 : status === "ready" && installed
-                  ? "bg-success"
+                  ? "bg-success shadow-[0_0_8px_var(--success)]"
                   : "bg-muted-foreground/40"
             )}
           />
@@ -126,7 +126,7 @@ export function ModelPicker() {
       <PopoverContent
         align="start"
         sideOffset={6}
-        className="w-[min(22rem,calc(100vw-2rem))] gap-0 overflow-hidden rounded-2xl p-0 shadow-xl"
+        className="glass w-[min(23rem,calc(100vw-2rem))] gap-0 overflow-hidden rounded-3xl p-0 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.5),0_0_50px_-20px_var(--brand)]"
       >
         <div className="flex items-center gap-2 border-b px-3">
           <SearchIcon className="size-4 shrink-0 text-muted-foreground" />
@@ -210,13 +210,13 @@ export function ModelPicker() {
                   data-index={index}
                   onMouseMove={() => setHighlight(index)}
                   onClick={() => choose(model)}
-                  className="relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left outline-none"
+                  className="relative flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left outline-none"
                 >
                   {highlight === index && (
                     <motion.span
                       layoutId="model-highlight"
                       transition={{ type: "spring", stiffness: 500, damping: 40 }}
-                      className="absolute inset-0 rounded-xl bg-accent"
+                      className="absolute inset-0 rounded-2xl bg-linear-to-r from-brand/20 to-brand-2/10 shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--brand)_25%,transparent)]"
                     />
                   )}
                   <span className="relative min-w-0 flex-1">
@@ -253,7 +253,7 @@ export function ModelPicker() {
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0, opacity: 0 }}
-                        className="relative grid size-5 place-items-center rounded-full bg-brand text-brand-foreground"
+                        className="relative grid size-5 place-items-center rounded-full bg-cosmic text-white shadow-[0_0_12px_var(--brand)]"
                       >
                         <CheckIcon className="size-3" strokeWidth={3} />
                       </motion.span>

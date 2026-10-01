@@ -30,7 +30,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Hint } from "@/components/chat/hint"
-import { LogoMark, Wordmark } from "@/components/chat/logo"
+import { Orb, Wordmark } from "@/components/chat/logo"
 import { easeOut, spring } from "@/components/chat/motion"
 import { ThemeToggle } from "@/components/chat/theme-toggle"
 import { stop } from "@/lib/chat"
@@ -90,6 +90,7 @@ function useGroups(conversations: Conversation[], query: string) {
 
 export function Sidebar() {
   const conversations = useChat((s) => s.conversations)
+  const busy = useChat((s) => Object.keys(s.generating).length > 0)
   const [query, setQuery] = useState("")
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
@@ -104,15 +105,15 @@ export function Sidebar() {
   const deleting = pendingDelete ? getConversation(pendingDelete) : undefined
 
   return (
-    <div className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
+    <div className="glass flex h-full w-full flex-col overflow-hidden rounded-[1.4rem] border text-sidebar-foreground shadow-[0_20px_60px_-30px_rgb(20_0_60/0.5)] dark:shadow-[0_20px_60px_-20px_rgb(0_0_0/0.8)]">
       {/* Brand */}
       <div className="flex h-14 shrink-0 items-center justify-between pr-2 pl-4">
         <button
           type="button"
           onClick={() => setActive(null)}
-          className="flex items-center gap-2 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         >
-          <LogoMark className="size-[1.35rem]" />
+          <Orb active={busy} className="size-5.5" glow="10px" />
           <Wordmark />
         </button>
         <Hint label="Close sidebar" shortcut={`${MOD_KEY}B`} side="right">
@@ -132,13 +133,15 @@ export function Sidebar() {
       <div className="flex flex-col gap-2 px-3 pb-2">
         <motion.button
           type="button"
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.015 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => setActive(null)}
-          className="group/new flex h-9 items-center gap-2.5 rounded-xl border bg-background/60 px-3 text-sm font-medium shadow-[0_1px_1px_rgb(0_0_0/0.03)] transition-colors outline-none hover:bg-background focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="group/new relative flex h-10 items-center gap-2.5 overflow-hidden rounded-2xl px-3.5 text-sm font-medium text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_24px_-8px_var(--brand)] outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         >
-          <SquarePenIcon className="size-4 text-brand transition-transform duration-300 ease-out-expo group-hover/new:-rotate-12" />
-          New chat
-          <kbd className="ml-auto font-sans text-[0.7rem] tracking-wide text-muted-foreground/80 max-md:hidden">
+          <span className="absolute inset-0 bg-cosmic bg-size-[200%_100%] transition-[background-position] duration-700 ease-out-expo group-hover/new:bg-position-[100%_0]" />
+          <SquarePenIcon className="relative size-4 transition-transform duration-300 ease-out-expo group-hover/new:-rotate-12" />
+          <span className="relative">New chat</span>
+          <kbd className="relative ml-auto font-sans text-[0.7rem] tracking-wide text-white/70 max-md:hidden">
             {MOD_KEY}⇧O
           </kbd>
         </motion.button>
@@ -151,7 +154,7 @@ export function Sidebar() {
             onKeyDown={(e) => e.key === "Escape" && setQuery("")}
             placeholder="Search chats"
             aria-label="Search chats"
-            className="h-8 w-full rounded-lg bg-transparent pr-8 pl-8.5 text-sm transition-colors outline-none placeholder:text-muted-foreground/80 hover:bg-sidebar-accent/50 focus:bg-sidebar-accent/70"
+            className="h-9 w-full rounded-xl border border-transparent bg-sidebar-accent/50 pr-8 pl-8.5 text-sm transition-[background-color,border-color,box-shadow] outline-none placeholder:text-muted-foreground/80 hover:bg-sidebar-accent focus:border-brand/40 focus:bg-sidebar-accent focus:shadow-[0_0_20px_-6px_var(--brand)]"
           />
           <AnimatePresence>
             {query && (
@@ -188,7 +191,7 @@ export function Sidebar() {
                 transition={easeOut}
                 className="pt-3"
               >
-                <h3 className="px-2.5 pb-1 text-[0.7rem] font-medium tracking-wide text-muted-foreground/80 uppercase">
+                <h3 className="px-2.5 pb-1.5 font-display text-[0.62rem] font-medium tracking-[0.12em] text-muted-foreground/70 uppercase">
                   {group.label}
                 </h3>
                 <ul className="flex flex-col gap-px">
@@ -229,7 +232,7 @@ export function Sidebar() {
         open={!!pendingDelete}
         onOpenChange={(open) => !open && setPendingDelete(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="glass rounded-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this chat?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -283,8 +286,10 @@ const ConversationItem = memo(function ConversationItem({
         <motion.span
           layoutId="active-conversation"
           transition={spring}
-          className="absolute inset-0 rounded-lg bg-sidebar-accent shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--foreground)_4%,transparent)]"
-        />
+          className="absolute inset-0 overflow-hidden rounded-xl bg-linear-to-r from-brand/25 via-brand/10 to-brand-2/5 shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--brand)_25%,transparent)]"
+        >
+          <span className="absolute inset-y-2 left-0 w-[3px] rounded-full bg-linear-to-b from-brand-2 via-brand to-brand-3 shadow-[0_0_10px_var(--brand)]" />
+        </motion.span>
       )}
       {renaming ? (
         <RenameInput
@@ -301,7 +306,7 @@ const ConversationItem = memo(function ConversationItem({
           onDoubleClick={() => setRenaming(true)}
           aria-current={active ? "page" : undefined}
           className={cn(
-            "relative flex h-8.5 w-full items-center gap-2 rounded-lg px-2.5 text-left text-[0.8125rem] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+            "relative flex h-9 w-full items-center gap-2 rounded-xl pr-2.5 pl-3.5 text-left text-[0.8125rem] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
             active
               ? "text-sidebar-accent-foreground"
               : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
@@ -352,7 +357,7 @@ const ConversationItem = memo(function ConversationItem({
             align="start"
             side="right"
             sideOffset={6}
-            className="w-40 rounded-xl p-1"
+            className="glass w-40 rounded-2xl p-1"
           >
             <DropdownMenuItem onClick={() => setRenaming(true)}>
               <PencilIcon />
@@ -407,7 +412,7 @@ function RenameInput({
         if (e.key === "Enter") finish(value)
         if (e.key === "Escape") finish(null)
       }}
-      className="relative h-8.5 w-full rounded-lg bg-background px-2.5 text-[0.8125rem] ring-2 ring-brand/40 outline-none"
+      className="relative h-8.5 w-full rounded-xl bg-background/60 px-2.5 text-[0.8125rem] ring-2 ring-brand/50 outline-none"
     />
   )
 }
@@ -420,7 +425,7 @@ function SidebarFooter() {
   const online = status === "ready" || (status === "loading" && !!version)
 
   return (
-    <div className="flex shrink-0 items-center justify-between gap-2 border-t border-sidebar-border px-3 py-2.5">
+    <div className="flex shrink-0 items-center justify-between gap-2 border-t px-3 py-2.5">
       <button
         type="button"
         onClick={() => void refreshModels()}

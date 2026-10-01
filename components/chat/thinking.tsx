@@ -36,7 +36,7 @@ export function Thinking({
         className="group/think flex items-center gap-1.5 rounded-md py-1 text-[0.8125rem] text-muted-foreground transition-colors hover:text-foreground"
       >
         <SparklesIcon
-          className={cn("size-3.5", active && "animate-breathe text-brand")}
+          className={cn("size-3.5", active && "animate-breathe text-brand-2")}
         />
         <span className={cn(active && "text-shimmer")}>
           {active ? "Thinking" : `Thought for ${formatSeconds(durationMs)}`}
@@ -61,7 +61,7 @@ export function Thinking({
           >
             <div
               className={cn(
-                "mt-1 ml-[7px] border-l-2 border-border pl-4 text-[0.8125rem] leading-relaxed whitespace-pre-wrap text-muted-foreground",
+                "mt-1 ml-[7px] border-l-2 border-brand/30 pl-4 text-[0.8125rem] leading-relaxed whitespace-pre-wrap text-muted-foreground",
                 active &&
                   "flex max-h-48 flex-col-reverse overflow-hidden mask-t-from-70%"
               )}

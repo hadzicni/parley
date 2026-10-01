@@ -18,7 +18,7 @@ export function ThemeToggle() {
     <div
       role="radiogroup"
       aria-label="Theme"
-      className="flex items-center gap-0.5 rounded-full bg-sidebar-accent/70 p-0.5"
+      className="flex items-center gap-0.5 rounded-full border bg-sidebar-accent/50 p-0.5"
     >
       {options.map(({ value, label, icon: Icon }) => {
         const active = theme === value
@@ -38,14 +38,14 @@ export function ThemeToggle() {
             }}
             className={cn(
               "relative grid size-6 place-items-center rounded-full text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50",
-              active && "text-foreground"
+              active && "text-white hover:text-white"
             )}
           >
             {active && (
               <motion.span
                 layoutId="theme-pill"
                 transition={spring}
-                className="absolute inset-0 rounded-full bg-background shadow-sm ring-1 ring-foreground/5"
+                className="absolute inset-0 rounded-full bg-cosmic shadow-[0_0_12px_-2px_var(--brand)]"
               />
             )}
             <Icon className="relative size-3.5" />

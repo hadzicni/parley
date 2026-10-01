@@ -1,7 +1,7 @@
 "use client"
 
 import { useSyncExternalStore } from "react"
-import { THEME_STORAGE_KEY } from "@/lib/theme-script"
+import { DEFAULT_THEME, THEME_STORAGE_KEY } from "@/lib/theme-script"
 
 export type Theme = "light" | "dark" | "system"
 
@@ -10,9 +10,11 @@ const listeners = new Set<() => void>()
 function readTheme(): Theme {
   try {
     const value = localStorage.getItem(THEME_STORAGE_KEY)
-    return value === "light" || value === "dark" ? value : "system"
+    return value === "light" || value === "dark" || value === "system"
+      ? value
+      : DEFAULT_THEME
   } catch {
-    return "system"
+    return DEFAULT_THEME
   }
 }
 
@@ -88,6 +90,6 @@ export function useTheme(): Theme {
       return () => listeners.delete(l)
     },
     readTheme,
-    () => "system"
+    () => DEFAULT_THEME
   )
 }

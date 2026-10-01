@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { ChatHeader } from "@/components/chat/chat-header"
 import { ChatView } from "@/components/chat/chat-view"
+import { Cosmos } from "@/components/chat/cosmos"
 import { softSpring } from "@/components/chat/motion"
 import { Sidebar } from "@/components/chat/sidebar"
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -11,7 +12,7 @@ import { stop } from "@/lib/chat"
 import { refreshModels } from "@/lib/ollama"
 import { getState, setActive, setSidebarOpen, useChat } from "@/lib/store"
 
-const SIDEBAR_WIDTH = 272
+const SIDEBAR_WIDTH = 292
 
 export function ChatApp() {
   const hydrated = useChat((s) => s.hydrated)
@@ -26,7 +27,8 @@ export function ChatApp() {
   useEffect(() => {
     void refreshModels()
     const poll = setInterval(() => {
-      if (getState().modelsStatus === "error") void refreshModels({ quiet: true })
+      if (getState().modelsStatus === "error")
+        void refreshModels({ quiet: true })
     }, 4000)
     const onFocus = () => void refreshModels({ quiet: true })
     window.addEventListener("focus", onFocus)
@@ -71,70 +73,77 @@ export function ChatApp() {
     return () => window.removeEventListener("keydown", onKeyDown)
   }, [])
 
-  if (!hydrated) return <div className="h-dvh bg-background" />
-
   return (
-    <div className="flex h-dvh overflow-hidden bg-background">
-      {isDesktop ? (
-        <motion.aside
-          initial={false}
-          animate={{ width: sidebarOpen ? SIDEBAR_WIDTH : 0 }}
-          transition={softSpring}
-          className="relative shrink-0 overflow-hidden border-sidebar-border data-[open=true]:border-r"
-          data-open={sidebarOpen}
-          aria-hidden={!sidebarOpen}
-          inert={!sidebarOpen}
-        >
-          <motion.div
-            initial={false}
-            animate={{ opacity: sidebarOpen ? 1 : 0, x: sidebarOpen ? 0 : -24 }}
-            transition={softSpring}
-            className="absolute inset-y-0 left-0"
-            style={{ width: SIDEBAR_WIDTH }}
-          >
-            <Sidebar />
-          </motion.div>
-        </motion.aside>
-      ) : (
-        <AnimatePresence>
-          {sidebarOpen && (
-            <>
+    <>
+      <Cosmos />
+      {hydrated && (
+        <div className="flex h-dvh overflow-hidden">
+          {isDesktop ? (
+            <motion.aside
+              initial={false}
+              animate={{ width: sidebarOpen ? SIDEBAR_WIDTH : 0 }}
+              transition={softSpring}
+              className="relative shrink-0 overflow-hidden"
+              aria-hidden={!sidebarOpen}
+              inert={!sidebarOpen}
+            >
               <motion.div
-                key="backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSidebarOpen(false)}
-                className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[2px]"
-              />
-              <motion.aside
-                key="drawer"
-                initial={{ x: "-100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "-100%" }}
-                transition={softSpring}
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={{ left: 0.6, right: 0 }}
-                onDragEnd={(_, info) => {
-                  if (info.offset.x < -80 || info.velocity.x < -400) {
-                    setSidebarOpen(false)
-                  }
+                initial={false}
+                animate={{
+                  opacity: sidebarOpen ? 1 : 0,
+                  x: sidebarOpen ? 0 : -40,
+                  scale: sidebarOpen ? 1 : 0.94,
+                  filter: sidebarOpen ? "blur(0px)" : "blur(6px)",
                 }}
-                className="fixed inset-y-0 left-0 z-50 shadow-2xl"
-                style={{ width: Math.min(SIDEBAR_WIDTH + 16, 320) }}
+                transition={softSpring}
+                className="absolute inset-y-0 left-0 origin-left p-2.5 pr-0"
+                style={{ width: SIDEBAR_WIDTH }}
               >
                 <Sidebar />
-              </motion.aside>
-            </>
+              </motion.div>
+            </motion.aside>
+          ) : (
+            <AnimatePresence>
+              {sidebarOpen && (
+                <>
+                  <motion.div
+                    key="backdrop"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setSidebarOpen(false)}
+                    className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+                  />
+                  <motion.aside
+                    key="drawer"
+                    initial={{ x: "-100%" }}
+                    animate={{ x: 0 }}
+                    exit={{ x: "-100%" }}
+                    transition={softSpring}
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={{ left: 0.6, right: 0 }}
+                    onDragEnd={(_, info) => {
+                      if (info.offset.x < -80 || info.velocity.x < -400) {
+                        setSidebarOpen(false)
+                      }
+                    }}
+                    className="fixed inset-y-0 left-0 z-50 p-2"
+                    style={{ width: Math.min(SIDEBAR_WIDTH + 8, 320) }}
+                  >
+                    <Sidebar />
+                  </motion.aside>
+                </>
+              )}
+            </AnimatePresence>
           )}
-        </AnimatePresence>
-      )}
 
-      <main className="flex min-w-0 flex-1 flex-col">
-        <ChatHeader />
-        <ChatView key={viewKey} />
-      </main>
-    </div>
+          <main className="flex min-w-0 flex-1 flex-col">
+            <ChatHeader />
+            <ChatView key={viewKey} />
+          </main>
+        </div>
+      )}
+    </>
   )
 }

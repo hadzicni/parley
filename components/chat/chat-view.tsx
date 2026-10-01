@@ -58,11 +58,11 @@ export function ChatView() {
         {!empty && conversation && (
           <div
             ref={scrollRef}
-            className="scroll-thin absolute inset-0 overflow-y-auto overscroll-contain [scrollbar-gutter:stable_both-edges]"
+            className="scroll-thin fade-y absolute inset-0 overflow-y-auto overscroll-contain [scrollbar-gutter:stable_both-edges]"
           >
             <div
               ref={contentRef}
-              className="mx-auto flex max-w-3xl flex-col gap-7 px-4 pt-4 pb-10 sm:px-6"
+              className="mx-auto flex max-w-3xl flex-col gap-9 px-4 pt-8 pb-12 sm:px-6"
             >
               <AnimatePresence initial={startedEmpty} mode="popLayout">
                 {messages.map((message, index) => (
@@ -98,7 +98,7 @@ export function ChatView() {
               transition={softSpring}
               whileTap={{ scale: 0.92 }}
               onClick={() => scrollToBottom()}
-              className="absolute bottom-3 left-1/2 z-10 -ml-4.5 grid size-9 place-items-center rounded-full border bg-background/90 text-muted-foreground shadow-lg backdrop-blur transition-colors hover:text-foreground"
+              className="glass absolute bottom-3 left-1/2 z-10 -ml-5 grid size-10 place-items-center rounded-full border text-muted-foreground shadow-[0_0_30px_-8px_var(--brand)] transition-colors hover:text-foreground"
             >
               <ArrowDownIcon className="size-4" />
             </motion.button>
@@ -107,17 +107,14 @@ export function ChatView() {
       </div>
 
       <div className="relative shrink-0 px-3 pb-3 sm:px-6">
-        {!empty && (
-          <div className="pointer-events-none absolute inset-x-0 -top-6 h-6 bg-linear-to-t from-background to-transparent" />
-        )}
         <div className="mx-auto max-w-3xl">
           <Composer
             conversationId={conversation?.id ?? null}
             viewKey={viewKey}
             onSend={() => scrollToBottom()}
           />
-          <p className="mt-2 text-center text-[0.7rem] text-muted-foreground/70">
-            Runs locally through Ollama. Models can make mistakes.
+          <p className="mt-2.5 text-center text-[0.68rem] tracking-wide text-muted-foreground/60">
+            Runs locally through Ollama · Models can make mistakes
           </p>
         </div>
       </div>

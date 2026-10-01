@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { CopyButton } from "@/components/chat/copy-button"
 import { Hint } from "@/components/chat/hint"
+import { Orb } from "@/components/chat/logo"
 import { Markdown } from "@/components/chat/markdown"
 import { Thinking } from "@/components/chat/thinking"
 import { easeOut, spring } from "@/components/chat/motion"
@@ -25,7 +26,9 @@ function tokensPerSecond(message: ChatMessage) {
   return stats.evalCount / (stats.evalDurationNs / 1e9)
 }
 
-/** Two dots leaning into each other — the logo, waiting for a reply. */
+const DOT_COLORS = ["var(--brand-2)", "var(--brand)", "var(--brand-3)"]
+
+/** Three dots bobbing in the brand colors while we wait for a first token. */
 export function PendingDots() {
   return (
     <div
@@ -36,8 +39,12 @@ export function PendingDots() {
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
-          className="size-1.5 rounded-full bg-brand"
-          animate={{ y: [0, -4, 0], opacity: [0.35, 1, 0.35] }}
+          className="size-2 rounded-full"
+          style={{
+            background: DOT_COLORS[i],
+            boxShadow: `0 0 10px ${DOT_COLORS[i]}`,
+          }}
+          animate={{ y: [0, -6, 0], scale: [0.8, 1.15, 0.8], opacity: [0.4, 1, 0.4] }}
           transition={{
             duration: 1.05,
             repeat: Infinity,
@@ -85,7 +92,7 @@ export const UserMessage = memo(function UserMessage({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={easeOut}
-            className="max-w-[85%] origin-bottom-right rounded-[1.35rem] rounded-br-md bg-secondary px-4 py-2.5 text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-secondary-foreground sm:max-w-[75%]"
+            className="relative max-w-[85%] origin-bottom-right overflow-hidden rounded-[1.4rem] rounded-br-md bg-linear-to-br from-[oklch(0.52_0.23_292)] via-[oklch(0.5_0.23_315)] to-[oklch(0.55_0.22_345)] px-4.5 py-2.5 text-[0.9375rem] leading-relaxed whitespace-pre-wrap text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_12px_32px_-12px_var(--brand)] sm:max-w-[75%]"
           >
             {message.content}
           </motion.div>
@@ -145,7 +152,7 @@ function EditBox({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={easeOut}
-      className="w-full origin-top-right rounded-2xl border bg-card p-2 shadow-sm ring-4 ring-brand/10 sm:w-[85%]"
+      className="beam glass w-full origin-top-right rounded-3xl border border-transparent p-2 shadow-[0_0_50px_-14px_var(--brand)] sm:w-[85%]"
     >
       <textarea
         ref={ref}
@@ -169,6 +176,7 @@ function EditBox({
           size="sm"
           disabled={!value.trim()}
           onClick={() => onSubmit(value)}
+          className="bg-cosmic text-white hover:opacity-90"
         >
           Send
         </Button>
@@ -197,6 +205,12 @@ export const AssistantMessage = memo(function AssistantMessage({
 
   return (
     <div className="group/msg relative">
+      <div className="mb-2.5 flex items-center gap-2">
+        <Orb active={streaming} className="size-5" glow="10px" />
+        <span className="font-display text-[0.7rem] font-medium tracking-[-0.01em] text-muted-foreground">
+          {message.model ?? "assistant"}
+        </span>
+      </div>
       {message.thinking && (
         <Thinking
           text={message.thinking}
@@ -226,7 +240,7 @@ export const AssistantMessage = memo(function AssistantMessage({
           animate={{ opacity: 1, y: 0 }}
           transition={easeOut}
           className={cn(
-            "flex items-start gap-2.5 rounded-xl border border-destructive/20 bg-destructive/5 px-3.5 py-3 text-sm text-destructive",
+            "glass flex items-start gap-2.5 rounded-2xl border border-destructive/30 px-3.5 py-3 text-sm text-destructive shadow-[0_0_40px_-16px_var(--destructive)]",
             content && "mt-4"
           )}
         >
@@ -274,20 +288,17 @@ export const AssistantMessage = memo(function AssistantMessage({
               </Button>
             </Hint>
             {message.status === "stopped" && (
-              <span className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[0.7rem] font-medium">
+              <span className="ml-1.5 inline-flex items-center gap-1 rounded-full border border-brand-3/30 bg-brand-3/10 px-2 py-0.5 text-[0.7rem] font-medium text-brand-3">
                 <SquareIcon className="size-2 fill-current" />
                 Stopped
               </span>
             )}
-            <span className="ml-2 truncate tabular-nums">
-              {message.model}
-              {tps !== null && (
-                <span className="text-muted-foreground/70">
-                  {" · "}
-                  {tps.toFixed(tps < 10 ? 1 : 0)} tok/s
-                </span>
-              )}
-            </span>
+            {tps !== null && (
+              <span className="ml-2 inline-flex items-center gap-1 font-mono text-[0.7rem] text-muted-foreground/80 tabular-nums">
+                <span className="size-1 rounded-full bg-brand-2 shadow-[0_0_6px_var(--brand-2)]" />
+                {tps.toFixed(tps < 10 ? 1 : 0)} tok/s
+              </span>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -60,6 +60,8 @@ export function Composer({
     const fit = () => {
       el.style.height = "0px"
       el.style.height = `${Math.min(el.scrollHeight, 240)}px`
+      // Only scroll once the limit is reached (avoids sub-pixel scrollbars).
+      el.style.overflowY = el.scrollHeight > 240 ? "auto" : "hidden"
     }
     fit()
     let width = el.clientWidth
@@ -111,9 +113,10 @@ export function Composer({
         event.preventDefault()
         submit()
       }}
+      data-active={generating}
       className={cn(
-        "group/composer relative rounded-[1.6rem] border bg-card shadow-[0_1px_2px_rgb(0_0_0/0.04),0_8px_24px_-12px_rgb(0_0_0/0.12)] transition-[border-color,box-shadow] duration-300 dark:shadow-[0_1px_2px_rgb(0_0_0/0.3),0_12px_32px_-12px_rgb(0_0_0/0.6)]",
-        "focus-within:border-brand/40 focus-within:shadow-[0_0_0_4px_color-mix(in_oklch,var(--brand)_12%,transparent),0_8px_24px_-12px_rgb(0_0_0/0.12)]"
+        "beam glass group/composer rounded-[1.75rem] border shadow-[0_20px_60px_-24px_rgb(20_0_60/0.35)] transition-[border-color,box-shadow] duration-500 dark:shadow-[0_24px_70px_-20px_rgb(0_0_0/0.8)]",
+        "focus-within:border-transparent focus-within:shadow-[0_0_50px_-12px_var(--brand),0_24px_70px_-24px_rgb(0_0_0/0.6)] data-[active=true]:border-transparent data-[active=true]:shadow-[0_0_60px_-10px_var(--brand-3),0_24px_70px_-24px_rgb(0_0_0/0.6)]"
       )}
       onClick={(event) => {
         if (event.target === event.currentTarget) textareaRef.current?.focus()
@@ -143,9 +146,9 @@ export function Composer({
             stop(conversationId)
           }
         }}
-        className="scroll-thin block max-h-60 min-h-[3.25rem] w-full resize-none bg-transparent pt-4 pr-16 pb-3.5 pl-5 text-[0.9375rem] leading-relaxed outline-none placeholder:text-muted-foreground/70"
+        className="scroll-thin block max-h-60 min-h-[3.5rem] w-full resize-none bg-transparent pt-4 pr-16 pb-4 pl-5.5 text-[0.9375rem] leading-relaxed outline-none placeholder:text-muted-foreground/70"
       />
-      <div className="absolute right-2.5 bottom-2.5">
+      <div className="absolute right-2.5 bottom-2.5 z-10">
         <Hint
           label={generating ? "Stop generating" : "Send message"}
           shortcut={generating ? "Esc" : "↵"}
@@ -159,26 +162,38 @@ export function Composer({
               event.preventDefault()
               stop(conversationId)
             }}
-            whileTap={{ scale: 0.88 }}
-            transition={{ type: "spring", stiffness: 600, damping: 30 }}
+            whileHover={generating || canSend ? { scale: 1.08 } : undefined}
+            whileTap={{ scale: 0.85, rotate: -8 }}
+            transition={{ type: "spring", stiffness: 600, damping: 26 }}
             className={cn(
-              "relative grid size-9 place-items-center rounded-full transition-[background-color,color,box-shadow] duration-200 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              "relative grid size-10 place-items-center rounded-full text-white transition-[color,box-shadow,opacity] duration-300 outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
               generating || canSend
-                ? "bg-foreground text-background shadow-sm hover:bg-foreground/85"
-                : "bg-muted text-muted-foreground/60"
+                ? "shadow-[0_0_24px_-4px_var(--brand),0_0_40px_-10px_var(--brand-2)]"
+                : "text-muted-foreground/60"
             )}
           >
+            <span
+              aria-hidden
+              className={cn(
+                "absolute inset-0 rounded-full transition-opacity duration-300",
+                generating || canSend ? "bg-cosmic opacity-100" : "bg-muted opacity-100"
+              )}
+            />
             {generating && (
               <motion.span
                 aria-hidden
-                className="absolute inset-0 rounded-full ring-2 ring-brand/50"
+                className="absolute inset-0 rounded-full ring-2 ring-brand-3/60"
                 initial={{ opacity: 0, scale: 1 }}
-                animate={{ opacity: [0.7, 0], scale: [1, 1.45] }}
-                transition={{ duration: 1.6, repeat: Infinity, ease: "easeOut" }}
+                animate={{ opacity: [0.8, 0], scale: [1, 1.7] }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
               />
             )}
             <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span key={generating ? "stop" : "send"} {...iconSwap}>
+              <motion.span
+                key={generating ? "stop" : "send"}
+                className="relative"
+                {...iconSwap}
+              >
                 {generating ? (
                   <SquareIcon className="size-3.5 fill-current" />
                 ) : (
