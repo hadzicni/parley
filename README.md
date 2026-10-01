@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Parley
 
-## Getting Started
+A calm, fast chat interface for the models running in your local [Ollama](https://ollama.com).
 
-First, run the development server:
+- Pick any installed model; reasoning models show their thinking in a collapsible trace
+- Streaming responses with a smoothed reveal, markdown, tables and syntax-highlighted code
+- Stop a generation at any time (it's cancelled in Ollama too), regenerate, or edit a message
+- Multiple conversations in a searchable sidebar, auto-titled, saved in your browser's localStorage
+- Light, dark and system themes
+
+## Getting started
+
+Make sure Ollama is running and has at least one model:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+ollama pull llama3.2
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then start Parley:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+### Configuration
 
-To learn more about Next.js, take a look at the following resources:
+Parley talks to Ollama through its own server (`app/api/ollama/*`), so no CORS setup is needed. By default it connects to `http://localhost:11434`; set `OLLAMA_URL` to use another instance:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+OLLAMA_URL=http://192.168.1.20:11434 npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Keyboard shortcuts
 
-## Deploy on Vercel
+| Shortcut               | Action                   |
+| ---------------------- | ------------------------ |
+| `Enter` / `Shift+Enter` | Send / new line          |
+| `Esc`                  | Stop generating          |
+| `⌘/Ctrl + Shift + O`   | New chat                 |
+| `⌘/Ctrl + B`           | Toggle sidebar           |
+| `⌘/Ctrl + K`           | Search chats             |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Typing anywhere focuses the message box.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project layout
+
+```
+app/api/ollama/       Route handlers proxying Ollama (models, streaming chat)
+components/chat/      The chat UI
+hooks/                Smooth text reveal, stick-to-bottom scrolling, media queries
+lib/store.ts          Client store + localStorage persistence
+lib/chat.ts           Sending, streaming, stopping, regenerating, auto-titles
+lib/ollama.ts         Ollama client (NDJSON stream parsing)
+```
